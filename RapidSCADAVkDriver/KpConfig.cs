@@ -4,7 +4,7 @@ using System.Xml;
 
 namespace Scada.Comm.Devices.KpVk {
     internal class KpConfig {
-        public static string GetConfigName(string configDir, int kpNumber) {
+        public static string GetFileName(string configDir, int kpNumber) {
             return configDir + "KpVk_" + CommUtils.AddZeros(kpNumber, 3) + ".xml";
         }
 
@@ -44,7 +44,7 @@ namespace Scada.Comm.Devices.KpVk {
 
         public bool Save(string fileName, out string errorMessage) {
             try {
-                XmlDocument xmlDoc     = new XmlDocument();
+                XmlDocument    xmlDoc  = new XmlDocument();
                 XmlDeclaration xmlDecl = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null);
 
                 xmlDoc.AppendChild(xmlDecl);
@@ -65,6 +65,7 @@ namespace Scada.Comm.Devices.KpVk {
                 errorMessage = CommPhrases.SaveKpSettingsError + ":" + Environment.NewLine + exception.Message;
                 return false;
             }
+
         }
     }
 }
