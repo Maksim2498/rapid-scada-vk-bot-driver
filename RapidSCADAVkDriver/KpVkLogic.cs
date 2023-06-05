@@ -1,5 +1,4 @@
-﻿using Scada.Comm.Devices.KpVk;
-using Scada.Data.Models;
+﻿using Scada.Data.Models;
 using System;
 using System.Threading;
 
