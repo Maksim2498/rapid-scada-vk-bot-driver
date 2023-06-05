@@ -1,5 +1,5 @@
 ﻿namespace Scada.Comm.Devices.KpVk {
-    partial class FrmConfig {
+    partial class ConfigForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -75,7 +75,7 @@
             this.saveButton.TabIndex = 5;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
-            this.saveButton.Click += new System.EventHandler(this.button1_Click);
+            this.saveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // FrmConfig
             // 
@@ -89,7 +89,7 @@
             this.Controls.Add(this.hostTextBox);
             this.Name = "FrmConfig";
             this.Text = " ";
-            this.Load += new System.EventHandler(this.FrmConfig_Load);
+            this.Load += new System.EventHandler(this.ConfigForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

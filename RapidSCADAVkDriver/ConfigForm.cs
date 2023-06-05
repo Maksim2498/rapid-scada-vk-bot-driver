@@ -1,23 +1,21 @@
-﻿using Scada;
-using Scada.Comm;
-using Scada.UI;
+﻿using Scada.UI;
 using System;
 using System.IO;
 using System.Windows.Forms;
 
 namespace Scada.Comm.Devices.KpVk {
-    public partial class FrmConfig : Form {
+    public partial class ConfigForm : Form {
         private readonly AppDirs appDirs;
-        private readonly KpConfig config;
+        private readonly Config config;
         private readonly int kpNumber;
         private string configFileName;
 
-       public FrmConfig() {
+       public ConfigForm() {
             InitializeComponent();
         }
 
-        public FrmConfig(AppDirs appDirs, int kpNumber): this() {
-            config = new KpConfig();
+        public ConfigForm(AppDirs appDirs, int kpNumber): this() {
+            config = new Config();
             this.appDirs = appDirs ?? throw new ArgumentNullException(nameof(appDirs));
             this.kpNumber = kpNumber;
             configFileName = "";
@@ -29,12 +27,12 @@ namespace Scada.Comm.Devices.KpVk {
         }
 
         private void ControlsToConfig() {
-            config.Host      = hostTextBox.Text;
+            config.Host = hostTextBox.Text;
             config.ChannelId = channelIdTextBox.Text;
         }
 
-        private void FrmConfig_Load(object sender, EventArgs e) {
-            configFileName = KpConfig.GetFileName(appDirs.ConfigDir, kpNumber);
+        private void ConfigForm_Load(object sender, EventArgs args) {
+            configFileName = Config.GetFileName(appDirs.ConfigDir, kpNumber);
 
             if (File.Exists(configFileName) && !config.Load(configFileName, out string errorMessage))
                 ScadaUiUtils.ShowError(errorMessage);
@@ -42,7 +40,7 @@ namespace Scada.Comm.Devices.KpVk {
             ConfigToControls();
         }
 
-        private void button1_Click(object sender, EventArgs e) {
+        private void SaveButton_Click(object sender, EventArgs e) {
             ControlsToConfig();
 
             if (config.Save(configFileName, out string errorMessage))

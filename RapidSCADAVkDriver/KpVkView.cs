@@ -14,7 +14,7 @@ namespace Scada.Comm.Devices {
         public override string Version =>  "1.0.0.0";
 
         public override void ShowProps() {
-            new FrmConfig(AppDirs, Number).ShowDialog();
+            new ConfigForm(AppDirs, Number).ShowDialog();
         }
     }
 }

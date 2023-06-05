@@ -1,22 +1,21 @@
-﻿using Scada.Data.Entities;
-using System;
+﻿using System;
 using System.Xml;
 
 namespace Scada.Comm.Devices.KpVk {
-    internal class KpConfig {
+    internal class Config {
         public static string GetFileName(string configDir, int kpNumber) {
             return configDir + "KpVk_" + CommUtils.AddZeros(kpNumber, 3) + ".xml";
         }
 
-        public string Host      { get; set; }
+        public string Host { get; set; }
         public string ChannelId { get; set; }
 
-        public KpConfig() {
+        public Config() {
             SetToDefault();
         }
 
         public void SetToDefault() {
-            Host      = "https://vk.bot.rapidscada.fominmv.ru";
+            Host = "https://vk.bot.rapidscada.fominmv.ru";
             ChannelId = "";
         }
 
@@ -24,14 +23,14 @@ namespace Scada.Comm.Devices.KpVk {
             SetToDefault();
 
             try {
-                XmlDocument xmlDoc = new XmlDocument();
+                XmlDocument xmlDocument = new XmlDocument();
 
-                xmlDoc.Load(fileName);
+                xmlDocument.Load(fileName);
 
-                XmlElement rootElem = xmlDoc.DocumentElement;
+                XmlElement rootElement = xmlDocument.DocumentElement;
 
-                Host      = rootElem.GetChildAsString("Host"     );
-                ChannelId = rootElem.GetChildAsString("ChannelId");
+                Host = rootElement.GetChildAsString("Host");
+                ChannelId = rootElement.GetChildAsString("ChannelId");
 
                 errorMessage = "";
 
@@ -44,19 +43,19 @@ namespace Scada.Comm.Devices.KpVk {
 
         public bool Save(string fileName, out string errorMessage) {
             try {
-                XmlDocument    xmlDoc  = new XmlDocument();
-                XmlDeclaration xmlDecl = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null);
+                XmlDocument xmlDocument = new XmlDocument();
+                XmlDeclaration xmlDeclaration = xmlDocument.CreateXmlDeclaration("1.0", "utf-8", null);
 
-                xmlDoc.AppendChild(xmlDecl);
+                xmlDocument.AppendChild(xmlDeclaration);
 
-                XmlElement rootElem = xmlDoc.CreateElement("KpVkConfig");
+                XmlElement rootElement = xmlDocument.CreateElement("KpVkConfig");
 
-                xmlDoc.AppendChild(rootElem);
+                xmlDocument.AppendChild(rootElement);
 
-                rootElem.AppendElem("Host",      Host     );
-                rootElem.AppendElem("ChannelId", ChannelId);
+                rootElement.AppendElem("Host", Host);
+                rootElement.AppendElem("ChannelId", ChannelId);
 
-                xmlDoc.Save(fileName);
+                xmlDocument.Save(fileName);
 
                 errorMessage = "";
 
@@ -65,7 +64,6 @@ namespace Scada.Comm.Devices.KpVk {
                 errorMessage = CommPhrases.SaveKpSettingsError + ":" + Environment.NewLine + exception.Message;
                 return false;
             }
-
         }
     }
 }
