@@ -59,7 +59,7 @@
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config.cs" />
-    <Compile Include="KpViewLogic.cs" />
+    <Compile Include="KpVkLogic.cs" />
     <Compile Include="KpVkView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

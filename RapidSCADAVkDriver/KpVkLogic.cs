@@ -1,64 +1,83 @@
-﻿using Scada.Data.Models;
-using System;
+﻿using System;
+using System.Net.Http;
+using Scada.Data.Models;
+using System.Text;
 using System.Threading;
 
 namespace Scada.Comm.Devices {
     public class KpVkLogic : KPLogic {
-        private KpVk.Config config;
-        private bool     fatalError;
-        private string   state;
-        private bool     writeState;
+        private KpVk.Config config = new KpVk.Config();
+        private HttpClient httpClient = new HttpClient();
 
-        public KpVkLogic(int number = 0): base(number) {
-            CanSendCmd   = true;
+        public KpVkLogic(int number = 0) : base(number) {
+            CanSendCmd = true;
             ConnRequired = false;
-            WorkState    = WorkStates.Normal;
-
-            config = new KpVk.Config();
-            fatalError   = false;
-            state        = "";
-            writeState   = false;
+            WorkState = WorkStates.Normal;
         }
 
         public override void Session() {
-            if (writeState) {
-                WriteToLog("");
-                WriteToLog(state);
-                writeState = false;
-            }
-
             Thread.Sleep(ScadaUtils.ThreadDelay);
         }
 
         public override void SendCmd(Command cmd) {
             base.SendCmd(cmd);
 
-            if (fatalError) {
-                WriteToLog(state);
+            if (WorkState == WorkStates.Error) {
+                WriteToLog(Localization.UseRussian ? "Отправка уведомлений невозможна"
+                                                   : "Cannot send notifications");
+
                 return;
             }
-            this.AddEvent(new KPEvent());
 
-            WriteToLog("Got command!");
+            if (cmd.CmdNum != 1) {
+                WriteToLog(CommPhrases.IllegalCommand);
+                return;
+            }
+
+            WriteToLog(Localization.UseRussian ? "Отпарвка уведомления..."
+                                               : "Sending notification...");
+
+            try {
+                var task = httpClient.PostAsync(
+                    config.Host,
+                    new StringContent(
+                        $"{{\"channelId\":\"{config.ChannelId}\",\"message\":\"{cmd.GetCmdDataStr()}\"}}",
+                        Encoding.UTF8,
+                        "application/json"
+                    )
+                );
+
+                task.Wait();
+
+                WriteToLog(Localization.UseRussian ? $"Отправлено: {task.Result.StatusCode}"
+                                                   : $"Sent: {task.Result.StatusCode}");
+            } catch (Exception exception) {
+                WriteToLog(Localization.UseRussian ? $"Ошибка: {exception.Message}"
+                                                   : $"Error: {exception.Message}");
+            }
 
             CalcCmdStats();
         }
 
         public override void OnCommLineStart() {
-            writeState = true;
             LoadConfig();
             SetCurData(0, 0, 1);
         }
 
         private void LoadConfig() {
-            fatalError = !config.Load(KpVk.Config.GetFileName(AppDirs.ConfigDir, Number), out string errorMessage);
+            bool fatalError = !config.Load(KpVk.Config.GetFileName(AppDirs.ConfigDir, Number), out string errorMessage);
 
             if (fatalError) {
-                state = "Отправка уведомлений невозможна";
+                WorkState = WorkStates.Error;
+
+                WriteToLog(Localization.UseRussian ? "Не удалось прочитать файл конфигурации"
+                                                   : "Failed to read configuration file");
+
                 throw new Exception(errorMessage);
             }
 
-            state = "Ожидание команд...";
+            WriteToLog(Localization.UseRussian ? "Ожидание команд..."
+                                               : "Waiting for commands...");
         }
     }
 }
